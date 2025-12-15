@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪 Gym Tracker - Kamila & Ramon</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 1rem;
+        }
+        
+        .title-font {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            background: linear-gradient(135deg, #ec4899, #a855f7, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: #94a3b8;
+            font-size: 1.125rem;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+        }
+        
+        .card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .date-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .date-nav h2 {
+            flex: 1;
+            text-align: center;
+            font-size: clamp(1rem, 3vw, 1.5rem);
+        }
+        
+        .btn {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .btn-icon {
+            padding: 0.75rem;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .person-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .person-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .person-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            border-radius: 50%;
+            opacity: 0.1;
+            filter: blur(60px);
+        }
+        
+        .person-card.kamila::before {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+        
+        .person-card.ramon::before {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        
+        .person-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .person-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .avatar.kamila {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+        
+        .avatar.ramon {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        
+        .btn-gym {
+            width: 100%;
+            padding: 1.5rem;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-gym.active.kamila {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+        
+        .btn-gym.active.ramon {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        
+        .btn-weight {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1.875rem;
+            font-weight: 900;
+        }
+        
+        .stat-value.kamila {
+            color: #ec4899;
+        }
+        
+        .stat-value.ramon {
+            color: #06b6d4;
+        }
+        
+        .stat-value.purple {
+            color: #a855f7;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .calendar-header {
+            text-align: center;
+            color: #94a3b8;
+            font-weight: 600;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+        }
+        
+        .calendar-day:hover {
+            transform: scale(1.1);
+        }
+        
+        .calendar-day.kamila {
+            background: rgba(236, 72, 153, 0.6);
+        }
+        
+        .calendar-day.ramon {
+            background: rgba(6, 182, 212, 0.6);
+        }
+        
+        .calendar-day.both {
+            background: linear-gradient(135deg, #ec4899, #06b6d4);
+        }
+        
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1.25rem;
+            font-family: inherit;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .modal-buttons .btn {
+            flex: 1;
+        }
+        
+        .btn-save.kamila {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+        
+        .btn-save.ramon {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .legend-color {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 0.25rem;
+        }
+        
+        .legend-color.kamila {
+            background: #ec4899;
+        }
+        
+        .legend-color.ramon {
+            background: #06b6d4;
+        }
+        
+        .legend-color.both {
+            background: linear-gradient(to right, #ec4899, #06b6d4);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .view {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .award-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.6));
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .award-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+        
+        .award-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #a855f7;
+        }
+        
+        .award-winner {
+            font-size: 3rem;
+            margin: 1rem 0;
+        }
+        
+        .award-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+        
+        .award-score {
+            font-size: 1.125rem;
+            color: #94a3b8;
+        }
+        
+        .award-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .period-section {
+            margin-bottom: 2rem;
+        }
+        
+        .period-title {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #ec4899, #a855f7, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        @media (max-width: 640px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .btn-gym {
+                font-size: 1rem;
+                padding: 1rem;
+            }
+            
+            .calendar-grid {
+                gap: 0.25rem;
+            }
+            
+            .calendar-day {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title-font">💪 Gym Tracker</h1>
+            <p>Kamila & Ramon • Melhor Casal do Mundo 🏆</p>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="showView('dashboard')">📊 Dashboard</button>
+            <button class="nav-btn" onclick="showView('calendar')">📅 Calendário</button>
+            <button class="nav-btn" onclick="showView('charts')">📈 Gráficos</button>
+            <button class="nav-btn" onclick="showView('awards')">🏆 Premiações</button>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard" class="view">
+            <div class="card">
+                <div class="date-nav">
+                    <button class="btn btn-icon" onclick="changeDate(-1)">‹</button>
+                    <h2 class="title-font" id="current-date"></h2>
+                    <button class="btn btn-icon" id="next-btn" onclick="changeDate(1)">›</button>
+                </div>
+            </div>
+
+            <div class="person-cards">
+                <!-- Kamila Card -->
+                <div class="card person-card kamila">
+                    <div class="person-header">
+                        <div class="person-info">
+                            <div class="avatar kamila">👩</div>
+                            <h3 class="title-font">Kamila</h3>
+                        </div>
+                        <span style="font-size: 2rem;">🏆</span>
+                    </div>
+                    <button class="btn btn-gym title-font" id="kamila-gym" onclick="toggleGym('kamila')">
+                        REGISTRAR IDA
+                    </button>
+                    <button class="btn btn-weight" onclick="openWeightModal('kamila')">
+                        ⚖️ Peso: <span id="kamila-weight">--</span> kg
+                    </button>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Total de Idas</div>
+                            <div class="stat-value kamila" id="kamila-total">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Dias Ativos</div>
+                            <div class="stat-value kamila" id="kamila-days">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ramon Card -->
+                <div class="card person-card ramon">
+                    <div class="person-header">
+                        <div class="person-info">
+                            <div class="avatar ramon">👨</div>
+                            <h3 class="title-font">Ramon</h3>
+                        </div>
+                        <span style="font-size: 2rem;">🏆</span>
+                    </div>
+                    <button class="btn btn-gym title-font" id="ramon-gym" onclick="toggleGym('ramon')">
+                        REGISTRAR IDA
+                    </button>
+                    <button class="btn btn-weight" onclick="openWeightModal('ramon')">
+                        ⚖️ Peso: <span id="ramon-weight">--</span> kg
+                    </button>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Total de Idas</div>
+                            <div class="stat-value ramon" id="ramon-total">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Dias Ativos</div>
+                            <div class="stat-value ramon" id="ramon-days">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="title-font" style="margin-bottom: 1rem;">🏅 Estatísticas Rápidas</h3>
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Combinado</div>
+                        <div class="stat-value purple" id="total-combined">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Média/Pessoa</div>
+                        <div class="stat-value purple" id="average">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Dias Registrados</div>
+                        <div class="stat-value purple" id="total-days">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Hoje</div>
+                        <div class="stat-value" id="today-status" style="font-size: 2rem;">😴</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div id="calendar" class="view hidden">
+            <div class="card">
+                <div class="date-nav">
+                    <button class="btn btn-icon" onclick="changeMonth(-1)">‹</button>
+                    <h2 class="title-font" id="calendar-month"></h2>
+                    <button class="btn" onclick="goToToday()">Hoje</button>
+                    <button class="btn btn-icon" onclick="changeMonth(1)">›</button>
+                </div>
+                
+                <div class="calendar-grid">
+                    <div class="calendar-header">Dom</div>
+                    <div class="calendar-header">Seg</div>
+                    <div class="calendar-header">Ter</div>
+                    <div class="calendar-header">Qua</div>
+                    <div class="calendar-header">Qui</div>
+                    <div class="calendar-header">Sex</div>
+                    <div class="calendar-header">Sáb</div>
+                </div>
+                
+                <div class="calendar-grid" id="calendar-days"></div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color kamila"></div>
+                        <span>Kamila</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color ramon"></div>
+                        <span>Ramon</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color both"></div>
+                        <span>Ambos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts View -->
+        <div id="charts" class="view hidden">
+            <div class="card">
+                <div class="chart-title title-font">
+                    📊 Evolução de Peso
+                </div>
+                <div class="chart-container">
+                    <canvas id="weight-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="chart-title title-font">
+                    📈 Frequência Mensal
+                </div>
+                <div class="chart-container">
+                    <canvas id="frequency-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="chart-title title-font">
+                    🔥 Sequência de Dias
+                </div>
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                    <div class="stat-box">
+                        <div class="stat-label">Sequência Atual Kamila</div>
+                        <div class="stat-value kamila" id="streak-kamila">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Sequência Atual Ramon</div>
+                        <div class="stat-value ramon" id="streak-ramon">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Melhor Sequência Kamila</div>
+                        <div class="stat-value kamila" id="best-streak-kamila">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Melhor Sequência Ramon</div>
+                        <div class="stat-value ramon" id="best-streak-ramon">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Awards View -->
+        <div id="awards" class="view hidden">
+            <!-- Semana -->
+            <div class="period-section">
+                <h2 class="period-title title-font">📅 Esta Semana</h2>
+                <div class="award-grid">
+                    <div class="award-card">
+                        <div class="award-title title-font">👟 Mais Frequente</div>
+                        <div class="award-winner" id="week-gym-emoji">🏆</div>
+                        <div class="award-name title-font" id="week-gym-winner">-</div>
+                        <div class="award-score" id="week-gym-score">-</div>
+                    </div>
+                    
+                    <div class="award-card">
+                        <div class="award-title title-font">📉 Maior Perda de Peso</div>
+                        <div class="award-winner" id="week-loss-emoji">🥇</div>
+                        <div class="award-name title-font" id="week-loss-winner">-</div>
+                        <div class="award-score" id="week-loss-score">-</div>
+                    </div>
+                    
+                    <div class="award-card">
+                        <div class="award-title title-font">💪 Maior Ganho de Peso</div>
+                        <div class="award-winner" id="week-gain-emoji">🥇</div>
+                        <div class="award-name title-font" id="week-gain-winner">-</div>
+                        <div class="award-score" id="week-gain-score">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mês -->
+            <div class="period-section">
+                <h2 class="period-title title-font">📆 Este Mês</h2>
+                <div class="award-grid">
+                    <div class="award-card">
+                        <div class="award-title title-font">👟 Mais Frequente</div>
+                        <div class="award-winner" id="month-gym-emoji">🏆</div>
+                        <div class="award-name title-font" id="month-gym-winner">-</div>
+                        <div class="award-score" id="month-gym-score">-</div>
+                    </div>
+                    
+                    <div class="award-card">
+                        <div class="award-title title-font">📉 Maior Perda de Peso</div>
+                        <div class="award-winner" id="month-loss-emoji">🥇</div>
+                        <div class="award-name title-font" id="month-loss-winner">-</div>
+                        <div class="award-score" id="month-loss-score">-</div>
+                    </div>
+                    
+                    <div class="award-card">
+                        <div class="award-title title-font">💪 Maior Ganho de Peso</div>
+                        <div class="award-winner" id="month-gain-emoji">🥇</div>
+                        <div class="award-name title-font" id="month-gain-winner">-</div>
+                        <div class="award-score" id="month-gain-score">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ano -->
+            <div class="period-section">
+                <h2 class="period-title title-font">🗓️ Este Ano</h2>
+                <div class="award-grid">
+                    <div class="award-card">
+                        <div class="award-title title-font">👟 Mais Frequente</div>
+                        <div class="award-winner" id="year-gym-emoji">🏆</div>
+                        <div class="award-name title-font" id="year-gym-winner">-</div>
+                        <div class="award-score" id="year-gym-score">-</div>
+                    </div>
+                    
+                    <div class="award-card">
+                        <div class="award-title title-font">📉 Maior Perda de Peso</div>
+                        <div class="award-winner" id="year-loss-emoji">🥇</div>
+                        <div class="award-name title-font" id="year-loss-winner">-</div>
+                        <div class="award-score" id="year-loss-score">-</div>
+                    </div>
+                    
+                    <div class="award-card">
+                        <div class="award-title title-font">💪 Maior Ganho de Peso</div>
+                        <div class="award-winner" id="year-gain-emoji">🥇</div>
+                        <div class="award-name title-font" id="year-gain-winner">-</div>
+                        <div class="award-score" id="year-gain-score">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placar Geral -->
+            <div class="card">
+                <h2 class="chart-title title-font">🎯 Placar Geral de Troféus</h2>
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="stat-box">
+                        <div class="stat-label">🏆 Troféus Kamila</div>
+                        <div class="stat-value kamila" id="kamila-trophies">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">🏆 Troféus Ramon</div>
+                        <div class="stat-value ramon" id="ramon-trophies">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight Modal -->
+    <div id="weight-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="title-font">Registrar Peso</h3>
+                <button class="btn btn-icon" onclick="closeWeightModal()">✕</button>
+            </div>
+            <input 
+                type="number" 
+                step="0.1" 
+                class="modal-input" 
+                id="weight-input" 
+                placeholder="Digite o peso em kg"
+            />
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeWeightModal()">Cancelar</button>
+                <button class="btn btn-save" id="save-weight-btn" onclick="saveWeight()">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let currentDate = new Date();
+        let currentView = 'dashboard';
+        let data = {};
+        let selectedPerson = null;
+        let weightChart = null;
+        let frequencyChart = null;
+
+        // Carregar dados do localStorage
+        function loadData() {
+            const saved = localStorage.getItem('gym-tracker-data');
+            if (saved) {
+                try {
+                    data = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Erro ao carregar dados:', e);
+                    data = {};
+                }
+            }
+        }
+
+        // Salvar dados no localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('gym-tracker-data', JSON.stringify(data));
+            } catch (e) {
+                console.error('Erro ao salvar dados:', e);
+                alert('Erro ao salvar dados. Tente novamente.');
+            }
+        }
+
+        // Obter chave da data
+        function getDateKey(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // Formatar data
+        function formatDate(date) {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            return date.toLocaleDateString('pt-BR', options);
+        }
+
+        // Formatar mês
+        function formatMonth(date) {
+            const options = { month: 'long', year: 'numeric' };
+            return date.toLocaleDateString('pt-BR', options);
+        }
+
+        // Alternar academia
+        function toggleGym(person) {
+            const dateKey = getDateKey(currentDate);
+            
+            if (!data[dateKey]) {
+                data[dateKey] = {
+                    kamilaGym: false,
+                    ramonGym: false,
+                    kamilaWeight: null,
+                    ramonWeight: null
+                };
+            }
+            
+            if (person === 'kamila') {
+                data[dateKey].kamilaGym = !data[dateKey].kamilaGym;
+            } else {
+                data[dateKey].ramonGym = !data[dateKey].ramonGym;
+            }
+            
+            saveData();
+            updateDashboard();
+        }
+
+        // Abrir modal de peso
+        function openWeightModal(person) {
+            selectedPerson = person;
+            const dateKey = getDateKey(currentDate);
+            const currentWeight = data[dateKey]?.[`${person}Weight`] || '';
+            
+            document.getElementById('weight-input').value = currentWeight;
+            document.getElementById('save-weight-btn').className = `btn btn-save ${person}`;
+            document.getElementById('weight-modal').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('weight-input').focus();
+            }, 100);
+        }
+
+        // Fechar modal de peso
+        function closeWeightModal() {
+            document.getElementById('weight-modal').classList.add('hidden');
+            selectedPerson = null;
+        }
+
+        // Salvar peso
+        function saveWeight() {
+            const weight = parseFloat(document.getElementById('weight-input').value);
+            
+            if (!weight || weight <= 0) {
+                alert('Digite um peso válido');
+                return;
+            }
+            
+            const dateKey = getDateKey(currentDate);
+            
+            if (!data[dateKey]) {
+                data[dateKey] = {
+                    kamilaGym: false,
+                    ramonGym: false,
+                    kamilaWeight: null,
+                    ramonWeight: null
+                };
+            }
+            
+            data[dateKey][`${selectedPerson}Weight`] = weight;
+            saveData();
+            updateDashboard();
+            closeWeightModal();
+        }
+
+        // Calcular estatísticas
+        function calculateStats() {
+            const today = getDateKey(currentDate);
+            const todayData = data[today] || { kamilaGym: false, ramonGym: false };
+            
+            let kamilaTotal = 0, ramonTotal = 0;
+            let kamilaDays = 0, ramonDays = 0;
+            let lastKamilaWeight = null, lastRamonWeight = null;
+            
+            const entries = Object.keys(data).sort();
+            
+            entries.forEach(key => {
+                if (data[key].kamilaGym) {
+                    kamilaTotal++;
+                    kamilaDays++;
+                }
+                if (data[key].ramonGym) {
+                    ramonTotal++;
+                    ramonDays++;
+                }
+            });
+            
+            // Últimos pesos
+            for (let i = entries.length - 1; i >= 0; i--) {
+                const key = entries[i];
+                if (!lastKamilaWeight && data[key].kamilaWeight) {
+                    lastKamilaWeight = data[key].kamilaWeight;
+                }
+                if (!lastRamonWeight && data[key].ramonWeight) {
+                    lastRamonWeight = data[key].ramonWeight;
+                }
+                if (lastKamilaWeight && lastRamonWeight) break;
+            }
+            
+            return {
+                todayKamila: todayData.kamilaGym,
+                todayRamon: todayData.ramonGym,
+                kamilaTotal,
+                ramonTotal,
+                kamilaDays,
+                ramonDays,
+                lastKamilaWeight,
+                lastRamonWeight,
+                totalDays: entries.length
+            };
+        }
+
+        // Atualizar dashboard
+        function updateDashboard() {
+            const stats = calculateStats();
+            
+            // Atualizar data
+            document.getElementById('current-date').textContent = formatDate(currentDate);
+            
+            // Desabilitar botão "próximo" se for hoje ou futuro
+            const isToday = getDateKey(currentDate) >= getDateKey(new Date());
+            document.getElementById('next-btn').disabled = isToday;
+            
+            // Botões de academia
+            const kamilaBtn = document.getElementById('kamila-gym');
+            const ramonBtn = document.getElementById('ramon-gym');
+            
+            if (stats.todayKamila) {
+                kamilaBtn.textContent = '✓ FOI NA ACADEMIA';
+                kamilaBtn.classList.add('active', 'kamila');
+                kamilaBtn.title = 'Clique novamente para desmarcar';
+            } else {
+                kamilaBtn.textContent = 'REGISTRAR IDA';
+                kamilaBtn.classList.remove('active', 'kamila');
+                kamilaBtn.title = '';
+            }
+            
+            if (stats.todayRamon) {
+                ramonBtn.textContent = '✓ FOI NA ACADEMIA';
+                ramonBtn.classList.add('active', 'ramon');
+                ramonBtn.title = 'Clique novamente para desmarcar';
+            } else {
+                ramonBtn.textContent = 'REGISTRAR IDA';
+                ramonBtn.classList.remove('active', 'ramon');
+                ramonBtn.title = '';
+            }
+            
+            // Pesos
+            document.getElementById('kamila-weight').textContent = stats.lastKamilaWeight || '--';
+            document.getElementById('ramon-weight').textContent = stats.lastRamonWeight || '--';
+            
+            // Estatísticas
+            document.getElementById('kamila-total').textContent = stats.kamilaTotal;
+            document.getElementById('kamila-days').textContent = stats.kamilaDays;
+            document.getElementById('ramon-total').textContent = stats.ramonTotal;
+            document.getElementById('ramon-days').textContent = stats.ramonDays;
+            
+            document.getElementById('total-combined').textContent = stats.kamilaTotal + stats.ramonTotal;
+            document.getElementById('average').textContent = ((stats.kamilaTotal + stats.ramonTotal) / 2).toFixed(1);
+            document.getElementById('total-days').textContent = stats.totalDays;
+            
+            let todayEmoji = '😴';
+            if (stats.todayKamila && stats.todayRamon) todayEmoji = '💪💪';
+            else if (stats.todayKamila || stats.todayRamon) todayEmoji = '💪';
+            document.getElementById('today-status').textContent = todayEmoji;
+        }
+
+        // Mudar data
+        function changeDate(days) {
+            currentDate.setDate(currentDate.getDate() + days);
+            updateDashboard();
+        }
+
+        // Mudar mês
+        function changeMonth(months) {
+            currentDate.setMonth(currentDate.getMonth() + months);
+            updateCalendar();
+        }
+
+        // Ir para hoje
+        function goToToday() {
+            currentDate = new Date();
+            if (currentView === 'dashboard') {
+                updateDashboard();
+            } else {
+                updateCalendar();
+            }
+        }
+
+        // Atualizar calendário
+        function updateCalendar() {
+            document.getElementById('calendar-month').textContent = formatMonth(currentDate);
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            const calendarDays = document.getElementById('calendar-days');
+            calendarDays.innerHTML = '';
+            
+            // Espaços vazios no início
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                calendarDays.innerHTML += '<div></div>';
+            }
+            
+            // Dias do mês
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dateKey = getDateKey(date);
+                const dayData = data[dateKey] || { kamilaGym: false, ramonGym: false };
+                
+                let className = 'calendar-day';
+                if (dayData.kamilaGym && dayData.ramonGym) {
+                    className += ' both';
+                } else if (dayData.kamilaGym) {
+                    className += ' kamila';
+                } else if (dayData.ramonGym) {
+                    className += ' ramon';
+                }
+                
+                const emoji = dayData.kamilaGym && dayData.ramonGym ? '💪💪' :
+                             dayData.kamilaGym ? '💪' :
+                             dayData.ramonGym ? '💪' : '';
+                
+                calendarDays.innerHTML += `
+                    <div class="${className}" onclick="goToDate('${dateKey}')">
+                        <div>${day}</div>
+                        <div style="font-size: 0.75rem;">${emoji}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Ir para data específica
+        function goToDate(dateKey) {
+            currentDate = new Date(dateKey);
+            showView('dashboard');
+        }
+
+        // Mostrar view
+        function showView(view) {
+            currentView = view;
+            
+            // Atualizar botões de navegação
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            
+            // Esconder todas as views
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('calendar').classList.add('hidden');
+            document.getElementById('charts').classList.add('hidden');
+            document.getElementById('awards').classList.add('hidden');
+            
+            if (view === 'dashboard') {
+                navBtns[0].classList.add('active');
+                document.getElementById('dashboard').classList.remove('hidden');
+                updateDashboard();
+            } else if (view === 'calendar') {
+                navBtns[1].classList.add('active');
+                document.getElementById('calendar').classList.remove('hidden');
+                updateCalendar();
+            } else if (view === 'charts') {
+                navBtns[2].classList.add('active');
+                document.getElementById('charts').classList.remove('hidden');
+                updateCharts();
+            } else if (view === 'awards') {
+                navBtns[3].classList.add('active');
+                document.getElementById('awards').classList.remove('hidden');
+                updateAwards();
+            }
+        }
+
+        // Calcular sequências
+        function calculateStreaks() {
+            const sortedKeys = Object.keys(data).sort();
+            if (sortedKeys.length === 0) {
+                return {
+                    currentKamila: 0,
+                    currentRamon: 0,
+                    bestKamila: 0,
+                    bestRamon: 0
+                };
+            }
+
+            let currentKamila = 0, currentRamon = 0;
+            let bestKamila = 0, bestRamon = 0;
+            let tempKamila = 0, tempRamon = 0;
+
+            // Calcular sequência atual (dos dias mais recentes)
+            for (let i = sortedKeys.length - 1; i >= 0; i--) {
+                const key = sortedKeys[i];
+                if (data[key].kamilaGym) {
+                    currentKamila++;
+                } else {
+                    break;
+                }
+            }
+
+            for (let i = sortedKeys.length - 1; i >= 0; i--) {
+                const key = sortedKeys[i];
+                if (data[key].ramonGym) {
+                    currentRamon++;
+                } else {
+                    break;
+                }
+            }
+
+            // Calcular melhor sequência
+            for (let key of sortedKeys) {
+                if (data[key].kamilaGym) {
+                    tempKamila++;
+                    bestKamila = Math.max(bestKamila, tempKamila);
+                } else {
+                    tempKamila = 0;
+                }
+
+                if (data[key].ramonGym) {
+                    tempRamon++;
+                    bestRamon = Math.max(bestRamon, tempRamon);
+                } else {
+                    tempRamon = 0;
+                }
+            }
+
+            return {
+                currentKamila,
+                currentRamon,
+                bestKamila,
+                bestRamon
+            };
+        }
+
+        // Atualizar gráficos
+        function updateCharts() {
+            const sortedKeys = Object.keys(data).sort();
+            
+            // Dados para gráfico de peso (últimos 30 registros com peso)
+            const weightData = sortedKeys
+                .filter(key => data[key].kamilaWeight || data[key].ramonWeight)
+                .slice(-30)
+                .map(key => ({
+                    date: new Date(key).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                    kamila: data[key].kamilaWeight || null,
+                    ramon: data[key].ramonWeight || null
+                }));
+
+            // Dados para gráfico de frequência mensal
+            const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const monthlyData = {};
+            
+            sortedKeys.forEach(key => {
+                const date = new Date(key);
+                const monthKey = `${monthNames[date.getMonth()]}/${date.getFullYear().toString().slice(-2)}`;
+                
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = { kamila: 0, ramon: 0 };
+                }
+                
+                if (data[key].kamilaGym) monthlyData[monthKey].kamila++;
+                if (data[key].ramonGym) monthlyData[monthKey].ramon++;
+            });
+
+            const frequencyData = Object.keys(monthlyData)
+                .slice(-12)
+                .map(month => ({
+                    month,
+                    kamila: monthlyData[month].kamila,
+                    ramon: monthlyData[month].ramon
+                }));
+
+            // Destruir gráficos antigos se existirem
+            if (weightChart) weightChart.destroy();
+            if (frequencyChart) frequencyChart.destroy();
+
+            // Criar gráfico de peso
+            const weightCtx = document.getElementById('weight-chart').getContext('2d');
+            weightChart = new Chart(weightCtx, {
+                type: 'line',
+                data: {
+                    labels: weightData.map(d => d.date),
+                    datasets: [
+                        {
+                            label: 'Kamila',
+                            data: weightData.map(d => d.kamila),
+                            borderColor: '#ec4899',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#ec4899'
+                        },
+                        {
+                            label: 'Ramon',
+                            data: weightData.map(d => d.ramon),
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#06b6d4'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: {
+                                    size: 14,
+                                    family: 'Inter'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Criar gráfico de frequência
+            const frequencyCtx = document.getElementById('frequency-chart').getContext('2d');
+            frequencyChart = new Chart(frequencyCtx, {
+                type: 'bar',
+                data: {
+                    labels: frequencyData.map(d => d.month),
+                    datasets: [
+                        {
+                            label: 'Kamila',
+                            data: frequencyData.map(d => d.kamila),
+                            backgroundColor: '#ec4899',
+                            borderRadius: 8
+                        },
+                        {
+                            label: 'Ramon',
+                            data: frequencyData.map(d => d.ramon),
+                            backgroundColor: '#06b6d4',
+                            borderRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: {
+                                    size: 14,
+                                    family: 'Inter'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Atualizar sequências
+            const streaks = calculateStreaks();
+            document.getElementById('streak-kamila').textContent = streaks.currentKamila;
+            document.getElementById('streak-ramon').textContent = streaks.currentRamon;
+            document.getElementById('best-streak-kamila').textContent = streaks.bestKamila;
+            document.getElementById('best-streak-ramon').textContent = streaks.bestRamon;
+        }
+
+        // Calcular frequência em um período
+        function calculateFrequencyInPeriod(startDate, endDate) {
+            let kamilaCount = 0;
+            let ramonCount = 0;
+
+            Object.keys(data).forEach(key => {
+                const date = new Date(key);
+                if (date >= startDate && date <= endDate) {
+                    if (data[key].kamilaGym) kamilaCount++;
+                    if (data[key].ramonGym) ramonCount++;
+                }
+            });
+
+            return { kamilaCount, ramonCount };
+        }
+
+        // Calcular mudança de peso em um período
+        function calculateWeightChangeInPeriod(startDate, endDate) {
+            const sortedKeys = Object.keys(data).sort();
+            
+            // Encontrar primeiro e último peso no período
+            let firstKamilaWeight = null, firstRamonWeight = null;
+            let lastKamilaWeight = null, lastRamonWeight = null;
+
+            sortedKeys.forEach(key => {
+                const date = new Date(key);
+                if (date >= startDate && date <= endDate) {
+                    if (!firstKamilaWeight && data[key].kamilaWeight) {
+                        firstKamilaWeight = data[key].kamilaWeight;
+                    }
+                    if (!firstRamonWeight && data[key].ramonWeight) {
+                        firstRamonWeight = data[key].ramonWeight;
+                    }
+                    if (data[key].kamilaWeight) {
+                        lastKamilaWeight = data[key].kamilaWeight;
+                    }
+                    if (data[key].ramonWeight) {
+                        lastRamonWeight = data[key].ramonWeight;
+                    }
+                }
+            });
+
+            const kamilaChange = (firstKamilaWeight && lastKamilaWeight) 
+                ? lastKamilaWeight - firstKamilaWeight 
+                : null;
+            const ramonChange = (firstRamonWeight && lastRamonWeight) 
+                ? lastRamonWeight - firstRamonWeight 
+                : null;
+
+            return { kamilaChange, ramonChange };
+        }
+
+        // Atualizar card de prêmio
+        function updateAwardCard(prefix, type, kamilaValue, ramonValue, unit = '') {
+            let winner, emoji, score;
+
+            if (kamilaValue === null && ramonValue === null) {
+                winner = '-';
+                emoji = '🤷';
+                score = 'Sem dados';
+            } else if (kamilaValue === null) {
+                winner = 'Ramon';
+                emoji = '🏆';
+                score = `${ramonValue}${unit}`;
+            } else if (ramonValue === null) {
+                winner = 'Kamila';
+                emoji = '🏆';
+                score = `${kamilaValue}${unit}`;
+            } else {
+                if (type === 'gym') {
+                    // Mais treinos ganha
+                    if (kamilaValue > ramonValue) {
+                        winner = 'Kamila';
+                        emoji = '🏆';
+                        score = `${kamilaValue}${unit} vs ${ramonValue}${unit}`;
+                    } else if (ramonValue > kamilaValue) {
+                        winner = 'Ramon';
+                        emoji = '🏆';
+                        score = `${ramonValue}${unit} vs ${kamilaValue}${unit}`;
+                    } else {
+                        winner = 'Empate!';
+                        emoji = '🤝';
+                        score = `${kamilaValue}${unit} cada`;
+                    }
+                } else if (type === 'loss') {
+                    // Menor valor (mais negativo) ganha
+                    if (kamilaValue < ramonValue) {
+                        winner = 'Kamila';
+                        emoji = '🥇';
+                        score = `${kamilaValue.toFixed(1)}${unit}`;
+                    } else if (ramonValue < kamilaValue) {
+                        winner = 'Ramon';
+                        emoji = '🥇';
+                        score = `${ramonValue.toFixed(1)}${unit}`;
+                    } else {
+                        winner = 'Empate!';
+                        emoji = '🤝';
+                        score = `${kamilaValue.toFixed(1)}${unit}`;
+                    }
+                } else if (type === 'gain') {
+                    // Maior valor (mais positivo) ganha
+                    if (kamilaValue > ramonValue) {
+                        winner = 'Kamila';
+                        emoji = '💪';
+                        score = `+${kamilaValue.toFixed(1)}${unit}`;
+                    } else if (ramonValue > kamilaValue) {
+                        winner = 'Ramon';
+                        emoji = '💪';
+                        score = `+${ramonValue.toFixed(1)}${unit}`;
+                    } else {
+                        winner = 'Empate!';
+                        emoji = '🤝';
+                        score = `+${kamilaValue.toFixed(1)}${unit}`;
+                    }
+                }
+            }
+
+            document.getElementById(`${prefix}-emoji`).textContent = emoji;
+            document.getElementById(`${prefix}-winner`).textContent = winner;
+            document.getElementById(`${prefix}-score`).textContent = score;
+
+            return winner === 'Kamila' ? 'kamila' : winner === 'Ramon' ? 'ramon' : null;
+        }
+
+        // Atualizar premiações
+        function updateAwards() {
+            const now = new Date();
+            let kamilaTrophies = 0;
+            let ramonTrophies = 0;
+
+            // SEMANA (últimos 7 dias)
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - 6);
+            weekStart.setHours(0, 0, 0, 0);
+
+            const weekFreq = calculateFrequencyInPeriod(weekStart, now);
+            const weekWeight = calculateWeightChangeInPeriod(weekStart, now);
+
+            const weekGymWinner = updateAwardCard('week-gym', 'gym', weekFreq.kamilaCount, weekFreq.ramonCount, ' treinos');
+            const weekLossWinner = updateAwardCard('week-loss', 'loss', weekWeight.kamilaChange, weekWeight.ramonChange, 'kg');
+            const weekGainWinner = updateAwardCard('week-gain', 'gain', weekWeight.kamilaChange, weekWeight.ramonChange, 'kg');
+
+            if (weekGymWinner === 'kamila') kamilaTrophies++;
+            if (weekGymWinner === 'ramon') ramonTrophies++;
+            if (weekLossWinner === 'kamila') kamilaTrophies++;
+            if (weekLossWinner === 'ramon') ramonTrophies++;
+            if (weekGainWinner === 'kamila') kamilaTrophies++;
+            if (weekGainWinner === 'ramon') ramonTrophies++;
+
+            // MÊS
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            const monthFreq = calculateFrequencyInPeriod(monthStart, now);
+            const monthWeight = calculateWeightChangeInPeriod(monthStart, now);
+
+            const monthGymWinner = updateAwardCard('month-gym', 'gym', monthFreq.kamilaCount, monthFreq.ramonCount, ' treinos');
+            const monthLossWinner = updateAwardCard('month-loss', 'loss', monthWeight.kamilaChange, monthWeight.ramonChange, 'kg');
+            const monthGainWinner = updateAwardCard('month-gain', 'gain', monthWeight.kamilaChange, monthWeight.ramonChange, 'kg');
+
+            if (monthGymWinner === 'kamila') kamilaTrophies++;
+            if (monthGymWinner === 'ramon') ramonTrophies++;
+            if (monthLossWinner === 'kamila') kamilaTrophies++;
+            if (monthLossWinner === 'ramon') ramonTrophies++;
+            if (monthGainWinner === 'kamila') kamilaTrophies++;
+            if (monthGainWinner === 'ramon') ramonTrophies++;
+
+            // ANO
+            const yearStart = new Date(now.getFullYear(), 0, 1);
+            
+            const yearFreq = calculateFrequencyInPeriod(yearStart, now);
+            const yearWeight = calculateWeightChangeInPeriod(yearStart, now);
+
+            const yearGymWinner = updateAwardCard('year-gym', 'gym', yearFreq.kamilaCount, yearFreq.ramonCount, ' treinos');
+            const yearLossWinner = updateAwardCard('year-loss', 'loss', yearWeight.kamilaChange, yearWeight.ramonChange, 'kg');
+            const yearGainWinner = updateAwardCard('year-gain', 'gain', yearWeight.kamilaChange, yearWeight.ramonChange, 'kg');
+
+            if (yearGymWinner === 'kamila') kamilaTrophies++;
+            if (yearGymWinner === 'ramon') ramonTrophies++;
+            if (yearLossWinner === 'kamila') kamilaTrophies++;
+            if (yearLossWinner === 'ramon') ramonTrophies++;
+            if (yearGainWinner === 'kamila') kamilaTrophies++;
+            if (yearGainWinner === 'ramon') ramonTrophies++;
+
+            // Atualizar placar geral
+            document.getElementById('kamila-trophies').textContent = kamilaTrophies;
+            document.getElementById('ramon-trophies').textContent = ramonTrophies;
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateDashboard();
+            
+            // Enter no modal de peso
+            document.getElementById('weight-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveWeight();
+                }
+            });
+            
+            // Fechar modal ao clicar fora
+            document.getElementById('weight-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeWeightModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
