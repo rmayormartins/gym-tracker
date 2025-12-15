@@ -5,19 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💪 Gym Tracker - Kamila & Ramon</title>
     
-    <!-- React, ReactDOM e Babel -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Recharts -->
-    <script src="https://unpkg.com/recharts@2.5.0/dist/Recharts.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -27,10 +18,11 @@
         }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
             min-height: 100vh;
             color: white;
+            padding: 1rem;
         }
         
         .title-font {
@@ -39,34 +31,388 @@
             letter-spacing: -0.02em;
         }
         
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            background: linear-gradient(135deg, #ec4899, #a855f7, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: #94a3b8;
+            font-size: 1.125rem;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+        }
+        
         .card {
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+        .date-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
         
-        .gradient-kamila {
-            background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+        .date-nav h2 {
+            flex: 1;
+            text-align: center;
+            font-size: clamp(1rem, 3vw, 1.5rem);
         }
         
-        .gradient-ramon {
-            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-        }
-        
-        .glass {
+        .btn {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-family: inherit;
+            font-size: 1rem;
         }
         
-        @keyframes fadeInUp {
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .btn-icon {
+            padding: 0.75rem;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .person-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .person-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .person-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            border-radius: 50%;
+            opacity: 0.1;
+            filter: blur(60px);
+        }
+        
+        .person-card.kamila::before {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+        
+        .person-card.ramon::before {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        
+        .person-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .person-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .avatar.kamila {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+        
+        .avatar.ramon {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        
+        .btn-gym {
+            width: 100%;
+            padding: 1.5rem;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-gym.active.kamila {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+        
+        .btn-gym.active.ramon {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        
+        .btn-weight {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1.875rem;
+            font-weight: 900;
+        }
+        
+        .stat-value.kamila {
+            color: #ec4899;
+        }
+        
+        .stat-value.ramon {
+            color: #06b6d4;
+        }
+        
+        .stat-value.purple {
+            color: #a855f7;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .calendar-header {
+            text-align: center;
+            color: #94a3b8;
+            font-weight: 600;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+        }
+        
+        .calendar-day:hover {
+            transform: scale(1.1);
+        }
+        
+        .calendar-day.kamila {
+            background: rgba(236, 72, 153, 0.6);
+        }
+        
+        .calendar-day.ramon {
+            background: rgba(6, 182, 212, 0.6);
+        }
+        
+        .calendar-day.both {
+            background: linear-gradient(135deg, #ec4899, #06b6d4);
+        }
+        
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1.25rem;
+            font-family: inherit;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .modal-buttons .btn {
+            flex: 1;
+        }
+        
+        .btn-save.kamila {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+        
+        .btn-save.ramon {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .legend-color {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 0.25rem;
+        }
+        
+        .legend-color.kamila {
+            background: #ec4899;
+        }
+        
+        .legend-color.ramon {
+            background: #06b6d4;
+        }
+        
+        .legend-color.both {
+            background: linear-gradient(to right, #ec4899, #06b6d4);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @keyframes fadeIn {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -77,758 +423,540 @@
             }
         }
         
-        .animate-fade-in {
-            animation: fadeInUp 0.6s ease-out;
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .btn-primary {
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: none;
-            font-family: inherit;
-            color: white;
+        .view {
+            animation: fadeIn 0.5s ease-out;
         }
         
-        .btn-primary:active {
-            transform: scale(0.95);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .calendar-day {
-            transition: all 0.2s ease;
-        }
-        
-        .calendar-day:hover {
-            transform: scale(1.05);
-        }
-        
-        input:focus {
-            outline: none;
+        @media (max-width: 640px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .btn-gym {
+                font-size: 1rem;
+                padding: 1rem;
+            }
+            
+            .calendar-grid {
+                gap: 0.25rem;
+            }
+            
+            .calendar-day {
+                font-size: 0.875rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="container">
+        <div class="header">
+            <h1 class="title-font">💪 Gym Tracker</h1>
+            <p>Kamila & Ramon • Melhor Casal do Mundo 🏆</p>
+        </div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = Recharts;
-        
-        // Simulação do window.storage para desenvolvimento local
-        const storage = {
-            data: {},
-            async get(key) {
-                const value = localStorage.getItem(key);
-                return value ? { key, value } : null;
-            },
-            async set(key, value) {
-                localStorage.setItem(key, value);
-                return { key, value };
+        <div class="nav">
+            <button class="nav-btn active" onclick="showView('dashboard')">📊 Dashboard</button>
+            <button class="nav-btn" onclick="showView('calendar')">📅 Calendário</button>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard" class="view">
+            <div class="card">
+                <div class="date-nav">
+                    <button class="btn btn-icon" onclick="changeDate(-1)">‹</button>
+                    <h2 class="title-font" id="current-date"></h2>
+                    <button class="btn btn-icon" id="next-btn" onclick="changeDate(1)">›</button>
+                </div>
+            </div>
+
+            <div class="person-cards">
+                <!-- Kamila Card -->
+                <div class="card person-card kamila">
+                    <div class="person-header">
+                        <div class="person-info">
+                            <div class="avatar kamila">👩</div>
+                            <h3 class="title-font">Kamila</h3>
+                        </div>
+                        <span style="font-size: 2rem;">🏆</span>
+                    </div>
+                    <button class="btn btn-gym title-font" id="kamila-gym" onclick="toggleGym('kamila')">
+                        REGISTRAR IDA
+                    </button>
+                    <button class="btn btn-weight" onclick="openWeightModal('kamila')">
+                        ⚖️ Peso: <span id="kamila-weight">--</span> kg
+                    </button>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Total de Idas</div>
+                            <div class="stat-value kamila" id="kamila-total">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Dias Ativos</div>
+                            <div class="stat-value kamila" id="kamila-days">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ramon Card -->
+                <div class="card person-card ramon">
+                    <div class="person-header">
+                        <div class="person-info">
+                            <div class="avatar ramon">👨</div>
+                            <h3 class="title-font">Ramon</h3>
+                        </div>
+                        <span style="font-size: 2rem;">🏆</span>
+                    </div>
+                    <button class="btn btn-gym title-font" id="ramon-gym" onclick="toggleGym('ramon')">
+                        REGISTRAR IDA
+                    </button>
+                    <button class="btn btn-weight" onclick="openWeightModal('ramon')">
+                        ⚖️ Peso: <span id="ramon-weight">--</span> kg
+                    </button>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Total de Idas</div>
+                            <div class="stat-value ramon" id="ramon-total">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Dias Ativos</div>
+                            <div class="stat-value ramon" id="ramon-days">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="title-font" style="margin-bottom: 1rem;">🏅 Estatísticas Rápidas</h3>
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Combinado</div>
+                        <div class="stat-value purple" id="total-combined">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Média/Pessoa</div>
+                        <div class="stat-value purple" id="average">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Dias Registrados</div>
+                        <div class="stat-value purple" id="total-days">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Hoje</div>
+                        <div class="stat-value" id="today-status" style="font-size: 2rem;">😴</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div id="calendar" class="view hidden">
+            <div class="card">
+                <div class="date-nav">
+                    <button class="btn btn-icon" onclick="changeMonth(-1)">‹</button>
+                    <h2 class="title-font" id="calendar-month"></h2>
+                    <button class="btn" onclick="goToToday()">Hoje</button>
+                    <button class="btn btn-icon" onclick="changeMonth(1)">›</button>
+                </div>
+                
+                <div class="calendar-grid">
+                    <div class="calendar-header">Dom</div>
+                    <div class="calendar-header">Seg</div>
+                    <div class="calendar-header">Ter</div>
+                    <div class="calendar-header">Qua</div>
+                    <div class="calendar-header">Qui</div>
+                    <div class="calendar-header">Sex</div>
+                    <div class="calendar-header">Sáb</div>
+                </div>
+                
+                <div class="calendar-grid" id="calendar-days"></div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color kamila"></div>
+                        <span>Kamila</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color ramon"></div>
+                        <span>Ramon</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color both"></div>
+                        <span>Ambos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight Modal -->
+    <div id="weight-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="title-font">Registrar Peso</h3>
+                <button class="btn btn-icon" onclick="closeWeightModal()">✕</button>
+            </div>
+            <input 
+                type="number" 
+                step="0.1" 
+                class="modal-input" 
+                id="weight-input" 
+                placeholder="Digite o peso em kg"
+            />
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeWeightModal()">Cancelar</button>
+                <button class="btn btn-save" id="save-weight-btn" onclick="saveWeight()">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let currentDate = new Date();
+        let currentView = 'dashboard';
+        let data = {};
+        let selectedPerson = null;
+
+        // Carregar dados do localStorage
+        function loadData() {
+            const saved = localStorage.getItem('gym-tracker-data');
+            if (saved) {
+                try {
+                    data = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Erro ao carregar dados:', e);
+                    data = {};
+                }
             }
-        };
-        
-        if (!window.storage) {
-            window.storage = storage;
         }
 
-        const GymTracker = () => {
-            const [currentDate, setCurrentDate] = useState(new Date());
-            const [showWeightModal, setShowWeightModal] = useState(false);
-            const [selectedPerson, setSelectedPerson] = useState(null);
-            const [tempWeight, setTempWeight] = useState('');
-            const [data, setData] = useState({});
-            const [loading, setLoading] = useState(true);
-            const [viewMode, setViewMode] = useState('dashboard');
-
-            useEffect(() => {
-                loadData();
-            }, []);
-
-            useEffect(() => {
-                lucide.createIcons();
-            }, [viewMode, showWeightModal]);
-
-            const loadData = async () => {
-                try {
-                    const result = await window.storage.get('gym-tracker-data');
-                    if (result) {
-                        setData(JSON.parse(result.value));
-                    }
-                } catch (error) {
-                    console.log('Iniciando com dados vazios');
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            const saveData = async (newData) => {
-                try {
-                    await window.storage.set('gym-tracker-data', JSON.stringify(newData));
-                    setData(newData);
-                } catch (error) {
-                    console.error('Erro ao salvar:', error);
-                }
-            };
-
-            const getDateKey = (date) => {
-                return date.toISOString().split('T')[0];
-            };
-
-            const toggleGym = async (person) => {
-                const dateKey = getDateKey(currentDate);
-                const newData = { ...data };
-                
-                if (!newData[dateKey]) {
-                    newData[dateKey] = {
-                        kamilaGym: false,
-                        ramonGym: false,
-                        kamilaWeight: null,
-                        ramonWeight: null
-                    };
-                }
-                
-                if (person === 'kamila') {
-                    newData[dateKey].kamilaGym = !newData[dateKey].kamilaGym;
-                } else {
-                    newData[dateKey].ramonGym = !newData[dateKey].ramonGym;
-                }
-                
-                await saveData(newData);
-            };
-
-            const openWeightModal = (person) => {
-                setSelectedPerson(person);
-                const dateKey = getDateKey(currentDate);
-                const currentWeight = data[dateKey]?.[`${person}Weight`] || '';
-                setTempWeight(currentWeight);
-                setShowWeightModal(true);
-            };
-
-            const saveWeight = async () => {
-                if (!tempWeight || isNaN(tempWeight)) return;
-                
-                const dateKey = getDateKey(currentDate);
-                const newData = { ...data };
-                
-                if (!newData[dateKey]) {
-                    newData[dateKey] = {
-                        kamilaGym: false,
-                        ramonGym: false,
-                        kamilaWeight: null,
-                        ramonWeight: null
-                    };
-                }
-                
-                newData[dateKey][`${selectedPerson}Weight`] = parseFloat(tempWeight);
-                await saveData(newData);
-                setShowWeightModal(false);
-                setTempWeight('');
-            };
-
-            const calculateStats = () => {
-                const today = getDateKey(currentDate);
-                const todayData = data[today] || { kamilaGym: false, ramonGym: false };
-                
-                let kamilaTotal = 0, ramonTotal = 0;
-                let kamilaDays = 0, ramonDays = 0;
-                const entries = Object.keys(data);
-                
-                entries.forEach(key => {
-                    if (data[key].kamilaGym) kamilaTotal++;
-                    if (data[key].ramonGym) ramonTotal++;
-                });
-                
-                kamilaDays = entries.filter(k => data[k].kamilaGym).length;
-                ramonDays = entries.filter(k => data[k].ramonGym).length;
-                
-                const sortedKeys = entries.sort().reverse();
-                let lastKamilaWeight = null, lastRamonWeight = null;
-                
-                for (let key of sortedKeys) {
-                    if (!lastKamilaWeight && data[key].kamilaWeight) {
-                        lastKamilaWeight = data[key].kamilaWeight;
-                    }
-                    if (!lastRamonWeight && data[key].ramonWeight) {
-                        lastRamonWeight = data[key].ramonWeight;
-                    }
-                    if (lastKamilaWeight && lastRamonWeight) break;
-                }
-                
-                return {
-                    todayKamila: todayData.kamilaGym,
-                    todayRamon: todayData.ramonGym,
-                    kamilaTotal,
-                    ramonTotal,
-                    kamilaDays,
-                    ramonDays,
-                    lastKamilaWeight,
-                    lastRamonWeight
-                };
-            };
-
-            const getMonthData = () => {
-                const year = currentDate.getFullYear();
-                const month = currentDate.getMonth();
-                const firstDay = new Date(year, month, 1);
-                const lastDay = new Date(year, month + 1, 0);
-                
-                const days = [];
-                for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
-                    const dateKey = getDateKey(new Date(d));
-                    const dayData = data[dateKey] || { kamilaGym: false, ramonGym: false };
-                    days.push({
-                        date: new Date(d),
-                        dateKey,
-                        ...dayData
-                    });
-                }
-                return days;
-            };
-
-            const getWeightChartData = () => {
-                const entries = Object.keys(data).sort().slice(-30);
-                return entries.map(key => ({
-                    date: new Date(key).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-                    Kamila: data[key].kamilaWeight || null,
-                    Ramon: data[key].ramonWeight || null
-                })).filter(d => d.Kamila !== null || d.Ramon !== null);
-            };
-
-            const getFrequencyChartData = () => {
-                const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-                const monthlyData = {};
-                
-                Object.keys(data).forEach(key => {
-                    const date = new Date(key);
-                    const monthKey = `${monthNames[date.getMonth()]}/${date.getFullYear().toString().slice(-2)}`;
-                    
-                    if (!monthlyData[monthKey]) {
-                        monthlyData[monthKey] = { month: monthKey, Kamila: 0, Ramon: 0 };
-                    }
-                    
-                    if (data[key].kamilaGym) monthlyData[monthKey].Kamila++;
-                    if (data[key].ramonGym) monthlyData[monthKey].Ramon++;
-                });
-                
-                return Object.values(monthlyData).slice(-12);
-            };
-
-            const changeDate = (days) => {
-                const newDate = new Date(currentDate);
-                newDate.setDate(newDate.getDate() + days);
-                setCurrentDate(newDate);
-            };
-
-            const changeMonth = (months) => {
-                const newDate = new Date(currentDate);
-                newDate.setMonth(newDate.getMonth() + months);
-                setCurrentDate(newDate);
-            };
-
-            const stats = calculateStats();
-            const monthData = getMonthData();
-
-            if (loading) {
-                return (
-                    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ fontSize: '2rem', animation: 'fadeInUp 1s infinite' }}>Carregando...</div>
-                    </div>
-                );
+        // Salvar dados no localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('gym-tracker-data', JSON.stringify(data));
+            } catch (e) {
+                console.error('Erro ao salvar dados:', e);
+                alert('Erro ao salvar dados. Tente novamente.');
             }
+        }
 
-            return (
-                <div style={{ minHeight: '100vh', padding: '2rem' }}>
-                    <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-                        {/* Header */}
-                        <div className="animate-fade-in" style={{ marginBottom: '2rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-                                <div>
-                                    <h1 className="title-font" style={{ 
-                                        fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
-                                        marginBottom: '0.5rem',
-                                        background: 'linear-gradient(to right, #ec4899, #a855f7, #06b6d4)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                        backgroundClip: 'text'
-                                    }}>
-                                        💪 Gym Tracker
-                                    </h1>
-                                    <p style={{ color: '#94a3b8', fontSize: '1.125rem' }}>
-                                        Kamila & Ramon • Melhor Casal do Mundo 🏆
-                                    </p>
-                                </div>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <button
-                                        onClick={() => setViewMode('dashboard')}
-                                        className={`btn-primary ${viewMode === 'dashboard' ? 'gradient-ramon' : 'glass'}`}
-                                        style={{ padding: '0.75rem', borderRadius: '0.75rem' }}
-                                    >
-                                        <i data-lucide="dumbbell" style={{ width: '24px', height: '24px' }}></i>
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('calendar')}
-                                        className={`btn-primary ${viewMode === 'calendar' ? 'gradient-ramon' : 'glass'}`}
-                                        style={{ padding: '0.75rem', borderRadius: '0.75rem' }}
-                                    >
-                                        <i data-lucide="calendar" style={{ width: '24px', height: '24px' }}></i>
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('charts')}
-                                        className={`btn-primary ${viewMode === 'charts' ? 'gradient-ramon' : 'glass'}`}
-                                        style={{ padding: '0.75rem', borderRadius: '0.75rem' }}
-                                    >
-                                        <i data-lucide="trending-up" style={{ width: '24px', height: '24px' }}></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+        // Obter chave da data
+        function getDateKey(date) {
+            return date.toISOString().split('T')[0];
+        }
 
-                        {viewMode === 'dashboard' && (
-                            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                {/* Data Atual */}
-                                <div className="card" style={{ borderRadius: '1rem', padding: '1.5rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-                                        <button
-                                            onClick={() => changeDate(-1)}
-                                            className="btn-primary glass"
-                                            style={{ padding: '0.5rem', borderRadius: '0.5rem' }}
-                                        >
-                                            <i data-lucide="chevron-left" style={{ width: '24px', height: '24px' }}></i>
-                                        </button>
-                                        <h2 className="title-font" style={{ fontSize: 'clamp(1.25rem, 3vw, 1.875rem)', textAlign: 'center', flex: 1 }}>
-                                            {currentDate.toLocaleDateString('pt-BR', { 
-                                                weekday: 'long', 
-                                                year: 'numeric', 
-                                                month: 'long', 
-                                                day: 'numeric' 
-                                            })}
-                                        </h2>
-                                        <button
-                                            onClick={() => changeDate(1)}
-                                            className="btn-primary glass"
-                                            style={{ padding: '0.5rem', borderRadius: '0.5rem' }}
-                                            disabled={getDateKey(currentDate) >= getDateKey(new Date())}
-                                        >
-                                            <i data-lucide="chevron-right" style={{ width: '24px', height: '24px' }}></i>
-                                        </button>
-                                    </div>
-                                </div>
+        // Formatar data
+        function formatDate(date) {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            return date.toLocaleDateString('pt-BR', options);
+        }
 
-                                {/* Check-in Cards */}
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                                    {/* Kamila */}
-                                    <div className="card" style={{ borderRadius: '1rem', padding: '2rem', position: 'relative', overflow: 'hidden' }}>
-                                        <div style={{ 
-                                            position: 'absolute', 
-                                            top: 0, 
-                                            right: 0, 
-                                            width: '8rem', 
-                                            height: '8rem', 
-                                            background: 'linear-gradient(135deg, #ec4899, #f43f5e)',
-                                            opacity: 0.2,
-                                            filter: 'blur(60px)',
-                                            borderRadius: '50%'
-                                        }}></div>
-                                        <div style={{ position: 'relative', zIndex: 10 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                    <div className="gradient-kamila" style={{ 
-                                                        width: '3rem', 
-                                                        height: '3rem', 
-                                                        borderRadius: '50%', 
-                                                        display: 'flex', 
-                                                        alignItems: 'center', 
-                                                        justifyContent: 'center' 
-                                                    }}>
-                                                        <i data-lucide="user" style={{ width: '24px', height: '24px' }}></i>
-                                                    </div>
-                                                    <h3 className="title-font" style={{ fontSize: '1.5rem' }}>Kamila</h3>
-                                                </div>
-                                                <i data-lucide="award" style={{ width: '32px', height: '32px', color: '#ec4899' }}></i>
-                                            </div>
-                                            
-                                            <button
-                                                onClick={() => toggleGym('kamila')}
-                                                className={`btn-primary title-font ${stats.todayKamila ? 'gradient-kamila' : 'glass'}`}
-                                                style={{ 
-                                                    width: '100%', 
-                                                    padding: '1.5rem', 
-                                                    borderRadius: '0.75rem', 
-                                                    marginBottom: '1rem',
-                                                    fontSize: '1.5rem'
-                                                }}
-                                            >
-                                                {stats.todayKamila ? '✓ FOI NA ACADEMIA' : 'REGISTRAR IDA'}
-                                            </button>
-                                            
-                                            <button
-                                                onClick={() => openWeightModal('kamila')}
-                                                className="btn-primary glass"
-                                                style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem' }}
-                                            >
-                                                ⚖️ Registrar Peso: {stats.lastKamilaWeight ? `${stats.lastKamilaWeight} kg` : 'Nenhum'}
-                                            </button>
-                                            
-                                            <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                                <div className="glass" style={{ padding: '1rem', borderRadius: '0.75rem' }}>
-                                                    <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Total de Idas</p>
-                                                    <p className="title-font" style={{ fontSize: '1.875rem', color: '#ec4899' }}>{stats.kamilaTotal}</p>
-                                                </div>
-                                                <div className="glass" style={{ padding: '1rem', borderRadius: '0.75rem' }}>
-                                                    <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Dias Ativos</p>
-                                                    <p className="title-font" style={{ fontSize: '1.875rem', color: '#ec4899' }}>{stats.kamilaDays}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+        // Formatar mês
+        function formatMonth(date) {
+            const options = { month: 'long', year: 'numeric' };
+            return date.toLocaleDateString('pt-BR', options);
+        }
 
-                                    {/* Ramon */}
-                                    <div className="card" style={{ borderRadius: '1rem', padding: '2rem', position: 'relative', overflow: 'hidden' }}>
-                                        <div style={{ 
-                                            position: 'absolute', 
-                                            top: 0, 
-                                            right: 0, 
-                                            width: '8rem', 
-                                            height: '8rem', 
-                                            background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
-                                            opacity: 0.2,
-                                            filter: 'blur(60px)',
-                                            borderRadius: '50%'
-                                        }}></div>
-                                        <div style={{ position: 'relative', zIndex: 10 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                    <div className="gradient-ramon" style={{ 
-                                                        width: '3rem', 
-                                                        height: '3rem', 
-                                                        borderRadius: '50%', 
-                                                        display: 'flex', 
-                                                        alignItems: 'center', 
-                                                        justifyContent: 'center' 
-                                                    }}>
-                                                        <i data-lucide="user" style={{ width: '24px', height: '24px' }}></i>
-                                                    </div>
-                                                    <h3 className="title-font" style={{ fontSize: '1.5rem' }}>Ramon</h3>
-                                                </div>
-                                                <i data-lucide="award" style={{ width: '32px', height: '32px', color: '#06b6d4' }}></i>
-                                            </div>
-                                            
-                                            <button
-                                                onClick={() => toggleGym('ramon')}
-                                                className={`btn-primary title-font ${stats.todayRamon ? 'gradient-ramon' : 'glass'}`}
-                                                style={{ 
-                                                    width: '100%', 
-                                                    padding: '1.5rem', 
-                                                    borderRadius: '0.75rem', 
-                                                    marginBottom: '1rem',
-                                                    fontSize: '1.5rem'
-                                                }}
-                                            >
-                                                {stats.todayRamon ? '✓ FOI NA ACADEMIA' : 'REGISTRAR IDA'}
-                                            </button>
-                                            
-                                            <button
-                                                onClick={() => openWeightModal('ramon')}
-                                                className="btn-primary glass"
-                                                style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem' }}
-                                            >
-                                                ⚖️ Registrar Peso: {stats.lastRamonWeight ? `${stats.lastRamonWeight} kg` : 'Nenhum'}
-                                            </button>
-                                            
-                                            <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                                <div className="glass" style={{ padding: '1rem', borderRadius: '0.75rem' }}>
-                                                    <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Total de Idas</p>
-                                                    <p className="title-font" style={{ fontSize: '1.875rem', color: '#06b6d4' }}>{stats.ramonTotal}</p>
-                                                </div>
-                                                <div className="glass" style={{ padding: '1rem', borderRadius: '0.75rem' }}>
-                                                    <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Dias Ativos</p>
-                                                    <p className="title-font" style={{ fontSize: '1.875rem', color: '#06b6d4' }}>{stats.ramonDays}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+        // Alternar academia
+        function toggleGym(person) {
+            const dateKey = getDateKey(currentDate);
+            
+            if (!data[dateKey]) {
+                data[dateKey] = {
+                    kamilaGym: false,
+                    ramonGym: false,
+                    kamilaWeight: null,
+                    ramonWeight: null
+                };
+            }
+            
+            if (person === 'kamila') {
+                data[dateKey].kamilaGym = !data[dateKey].kamilaGym;
+            } else {
+                data[dateKey].ramonGym = !data[dateKey].ramonGym;
+            }
+            
+            saveData();
+            updateDashboard();
+        }
 
-                                {/* Quick Stats */}
-                                <div className="card" style={{ borderRadius: '1rem', padding: '1.5rem' }}>
-                                    <h3 className="title-font" style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>🏅 Estatísticas Rápidas</h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-                                        <div className="glass" style={{ padding: '1rem', borderRadius: '0.75rem', textAlign: 'center' }}>
-                                            <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Total Combinado</p>
-                                            <p className="title-font" style={{ fontSize: '1.875rem', color: '#a855f7' }}>
-                                                {stats.kamilaTotal + stats.ramonTotal}
-                                            </p>
-                                        </div>
-                                        <div className="glass" style={{ padding: '1rem', borderRadius: '0.75rem', textAlign: 'center' }}>
-                                            <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Média/Pessoa</p>
-                                            <p className="title-font" style={{ fontSize: '1.875rem', color: '#a855f7' }}>
-                                                {((stats.kamilaTotal + stats.ramonTotal) / 2).toFixed(1)}
-                                            </p>
-                                        </div>
-                                        <div className="glass" style={{ padding: '1rem', borderRadius: '0.75rem', textAlign: 'center' }}>
-                                            <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Dias Registrados</p>
-                                            <p className="title-font" style={{ fontSize: '1.875rem', color: '#a855f7' }}>
-                                                {Object.keys(data).length}
-                                            </p>
-                                        </div>
-                                        <div className="glass" style={{ padding: '1rem', borderRadius: '0.75rem', textAlign: 'center' }}>
-                                            <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Hoje</p>
-                                            <p className="title-font" style={{ fontSize: '1.875rem' }}>
-                                                {stats.todayKamila && stats.todayRamon ? '💪💪' : 
-                                                 stats.todayKamila || stats.todayRamon ? '💪' : '😴'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+        // Abrir modal de peso
+        function openWeightModal(person) {
+            selectedPerson = person;
+            const dateKey = getDateKey(currentDate);
+            const currentWeight = data[dateKey]?.[`${person}Weight`] || '';
+            
+            document.getElementById('weight-input').value = currentWeight;
+            document.getElementById('save-weight-btn').className = `btn btn-save ${person}`;
+            document.getElementById('weight-modal').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('weight-input').focus();
+            }, 100);
+        }
 
-                        {viewMode === 'calendar' && (
-                            <div className="card animate-fade-in" style={{ borderRadius: '1rem', padding: '1.5rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-                                    <h2 className="title-font" style={{ fontSize: '1.875rem' }}>
-                                        {currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                                    </h2>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button
-                                            onClick={() => changeMonth(-1)}
-                                            className="btn-primary glass"
-                                            style={{ padding: '0.5rem', borderRadius: '0.5rem' }}
-                                        >
-                                            <i data-lucide="chevron-left" style={{ width: '24px', height: '24px' }}></i>
-                                        </button>
-                                        <button
-                                            onClick={() => setCurrentDate(new Date())}
-                                            className="btn-primary glass"
-                                            style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem' }}
-                                        >
-                                            Hoje
-                                        </button>
-                                        <button
-                                            onClick={() => changeMonth(1)}
-                                            className="btn-primary glass"
-                                            style={{ padding: '0.5rem', borderRadius: '0.5rem' }}
-                                        >
-                                            <i data-lucide="chevron-right" style={{ width: '24px', height: '24px' }}></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
-                                    {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
-                                        <div key={day} style={{ textAlign: 'center', color: '#94a3b8', fontWeight: 600, padding: '0.5rem' }}>
-                                            {day}
-                                        </div>
-                                    ))}
-                                    
-                                    {Array.from({ length: monthData[0]?.date.getDay() || 0 }).map((_, i) => (
-                                        <div key={`empty-${i}`} />
-                                    ))}
-                                    
-                                    {monthData.map((day) => (
-                                        <div
-                                            key={day.dateKey}
-                                            className={`calendar-day btn-primary ${
-                                                day.kamilaGym && day.ramonGym
-                                                    ? 'gradient-ramon'
-                                                    : day.kamilaGym
-                                                    ? 'gradient-kamila'
-                                                    : day.ramonGym
-                                                    ? 'gradient-ramon'
-                                                    : 'glass'
-                                            }`}
-                                            style={{ 
-                                                padding: '0.75rem', 
-                                                borderRadius: '0.75rem', 
-                                                textAlign: 'center',
-                                                background: day.kamilaGym && day.ramonGym 
-                                                    ? 'linear-gradient(to bottom right, #ec4899, #06b6d4)' 
-                                                    : day.kamilaGym 
-                                                    ? 'rgba(236, 72, 153, 0.7)' 
-                                                    : day.ramonGym 
-                                                    ? 'rgba(6, 182, 212, 0.7)' 
-                                                    : 'rgba(255, 255, 255, 0.05)'
-                                            }}
-                                            onClick={() => setCurrentDate(new Date(day.date))}
-                                        >
-                                            <div style={{ fontWeight: 600 }}>
-                                                {day.date.getDate()}
-                                            </div>
-                                            <div style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                                                {day.kamilaGym && '💪'}
-                                                {day.ramonGym && '💪'}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                                
-                                <div style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <div style={{ width: '1rem', height: '1rem', borderRadius: '0.25rem', background: '#ec4899' }}></div>
-                                        <span style={{ fontSize: '0.875rem' }}>Kamila</span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <div style={{ width: '1rem', height: '1rem', borderRadius: '0.25rem', background: '#06b6d4' }}></div>
-                                        <span style={{ fontSize: '0.875rem' }}>Ramon</span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <div style={{ width: '1rem', height: '1rem', borderRadius: '0.25rem', background: 'linear-gradient(to right, #ec4899, #06b6d4)' }}></div>
-                                        <span style={{ fontSize: '0.875rem' }}>Ambos</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+        // Fechar modal de peso
+        function closeWeightModal() {
+            document.getElementById('weight-modal').classList.add('hidden');
+            selectedPerson = null;
+        }
 
-                        {viewMode === 'charts' && (
-                            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                {/* Evolução de Peso */}
-                                <div className="card" style={{ borderRadius: '1rem', padding: '1.5rem' }}>
-                                    <h2 className="title-font" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>
-                                        📊 Evolução de Peso (Últimos 30 dias)
-                                    </h2>
-                                    <ResponsiveContainer width="100%" height={300}>
-                                        <LineChart data={getWeightChartData()}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                                            <XAxis dataKey="date" stroke="#94a3b8" />
-                                            <YAxis stroke="#94a3b8" domain={['dataMin - 2', 'dataMax + 2']} />
-                                            <Tooltip 
-                                                contentStyle={{ 
-                                                    backgroundColor: '#1e293b', 
-                                                    border: '1px solid #334155',
-                                                    borderRadius: '8px'
-                                                }} 
-                                            />
-                                            <Legend />
-                                            <Line 
-                                                type="monotone" 
-                                                dataKey="Kamila" 
-                                                stroke="#ec4899" 
-                                                strokeWidth={3}
-                                                dot={{ fill: '#ec4899', r: 4 }}
-                                            />
-                                            <Line 
-                                                type="monotone" 
-                                                dataKey="Ramon" 
-                                                stroke="#06b6d4" 
-                                                strokeWidth={3}
-                                                dot={{ fill: '#06b6d4', r: 4 }}
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
+        // Salvar peso
+        function saveWeight() {
+            const weight = parseFloat(document.getElementById('weight-input').value);
+            
+            if (!weight || weight <= 0) {
+                alert('Digite um peso válido');
+                return;
+            }
+            
+            const dateKey = getDateKey(currentDate);
+            
+            if (!data[dateKey]) {
+                data[dateKey] = {
+                    kamilaGym: false,
+                    ramonGym: false,
+                    kamilaWeight: null,
+                    ramonWeight: null
+                };
+            }
+            
+            data[dateKey][`${selectedPerson}Weight`] = weight;
+            saveData();
+            updateDashboard();
+            closeWeightModal();
+        }
 
-                                {/* Frequência Mensal */}
-                                <div className="card" style={{ borderRadius: '1rem', padding: '1.5rem' }}>
-                                    <h2 className="title-font" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>
-                                        📈 Frequência Mensal
-                                    </h2>
-                                    <ResponsiveContainer width="100%" height={300}>
-                                        <BarChart data={getFrequencyChartData()}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                                            <XAxis dataKey="month" stroke="#94a3b8" />
-                                            <YAxis stroke="#94a3b8" />
-                                            <Tooltip 
-                                                contentStyle={{ 
-                                                    backgroundColor: '#1e293b', 
-                                                    border: '1px solid #334155',
-                                                    borderRadius: '8px'
-                                                }} 
-                                            />
-                                            <Legend />
-                                            <Bar dataKey="Kamila" fill="#ec4899" radius={[8, 8, 0, 0]} />
-                                            <Bar dataKey="Ramon" fill="#06b6d4" radius={[8, 8, 0, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                        )}
+        // Calcular estatísticas
+        function calculateStats() {
+            const today = getDateKey(currentDate);
+            const todayData = data[today] || { kamilaGym: false, ramonGym: false };
+            
+            let kamilaTotal = 0, ramonTotal = 0;
+            let kamilaDays = 0, ramonDays = 0;
+            let lastKamilaWeight = null, lastRamonWeight = null;
+            
+            const entries = Object.keys(data).sort();
+            
+            entries.forEach(key => {
+                if (data[key].kamilaGym) {
+                    kamilaTotal++;
+                    kamilaDays++;
+                }
+                if (data[key].ramonGym) {
+                    ramonTotal++;
+                    ramonDays++;
+                }
+            });
+            
+            // Últimos pesos
+            for (let i = entries.length - 1; i >= 0; i--) {
+                const key = entries[i];
+                if (!lastKamilaWeight && data[key].kamilaWeight) {
+                    lastKamilaWeight = data[key].kamilaWeight;
+                }
+                if (!lastRamonWeight && data[key].ramonWeight) {
+                    lastRamonWeight = data[key].ramonWeight;
+                }
+                if (lastKamilaWeight && lastRamonWeight) break;
+            }
+            
+            return {
+                todayKamila: todayData.kamilaGym,
+                todayRamon: todayData.ramonGym,
+                kamilaTotal,
+                ramonTotal,
+                kamilaDays,
+                ramonDays,
+                lastKamilaWeight,
+                lastRamonWeight,
+                totalDays: entries.length
+            };
+        }
+
+        // Atualizar dashboard
+        function updateDashboard() {
+            const stats = calculateStats();
+            
+            // Atualizar data
+            document.getElementById('current-date').textContent = formatDate(currentDate);
+            
+            // Desabilitar botão "próximo" se for hoje ou futuro
+            const isToday = getDateKey(currentDate) >= getDateKey(new Date());
+            document.getElementById('next-btn').disabled = isToday;
+            
+            // Botões de academia
+            const kamilaBtn = document.getElementById('kamila-gym');
+            const ramonBtn = document.getElementById('ramon-gym');
+            
+            if (stats.todayKamila) {
+                kamilaBtn.textContent = '✓ FOI NA ACADEMIA';
+                kamilaBtn.classList.add('active', 'kamila');
+            } else {
+                kamilaBtn.textContent = 'REGISTRAR IDA';
+                kamilaBtn.classList.remove('active', 'kamila');
+            }
+            
+            if (stats.todayRamon) {
+                ramonBtn.textContent = '✓ FOI NA ACADEMIA';
+                ramonBtn.classList.add('active', 'ramon');
+            } else {
+                ramonBtn.textContent = 'REGISTRAR IDA';
+                ramonBtn.classList.remove('active', 'ramon');
+            }
+            
+            // Pesos
+            document.getElementById('kamila-weight').textContent = stats.lastKamilaWeight || '--';
+            document.getElementById('ramon-weight').textContent = stats.lastRamonWeight || '--';
+            
+            // Estatísticas
+            document.getElementById('kamila-total').textContent = stats.kamilaTotal;
+            document.getElementById('kamila-days').textContent = stats.kamilaDays;
+            document.getElementById('ramon-total').textContent = stats.ramonTotal;
+            document.getElementById('ramon-days').textContent = stats.ramonDays;
+            
+            document.getElementById('total-combined').textContent = stats.kamilaTotal + stats.ramonTotal;
+            document.getElementById('average').textContent = ((stats.kamilaTotal + stats.ramonTotal) / 2).toFixed(1);
+            document.getElementById('total-days').textContent = stats.totalDays;
+            
+            let todayEmoji = '😴';
+            if (stats.todayKamila && stats.todayRamon) todayEmoji = '💪💪';
+            else if (stats.todayKamila || stats.todayRamon) todayEmoji = '💪';
+            document.getElementById('today-status').textContent = todayEmoji;
+        }
+
+        // Mudar data
+        function changeDate(days) {
+            currentDate.setDate(currentDate.getDate() + days);
+            updateDashboard();
+        }
+
+        // Mudar mês
+        function changeMonth(months) {
+            currentDate.setMonth(currentDate.getMonth() + months);
+            updateCalendar();
+        }
+
+        // Ir para hoje
+        function goToToday() {
+            currentDate = new Date();
+            if (currentView === 'dashboard') {
+                updateDashboard();
+            } else {
+                updateCalendar();
+            }
+        }
+
+        // Atualizar calendário
+        function updateCalendar() {
+            document.getElementById('calendar-month').textContent = formatMonth(currentDate);
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            const calendarDays = document.getElementById('calendar-days');
+            calendarDays.innerHTML = '';
+            
+            // Espaços vazios no início
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                calendarDays.innerHTML += '<div></div>';
+            }
+            
+            // Dias do mês
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dateKey = getDateKey(date);
+                const dayData = data[dateKey] || { kamilaGym: false, ramonGym: false };
+                
+                let className = 'calendar-day';
+                if (dayData.kamilaGym && dayData.ramonGym) {
+                    className += ' both';
+                } else if (dayData.kamilaGym) {
+                    className += ' kamila';
+                } else if (dayData.ramonGym) {
+                    className += ' ramon';
+                }
+                
+                const emoji = dayData.kamilaGym && dayData.ramonGym ? '💪💪' :
+                             dayData.kamilaGym ? '💪' :
+                             dayData.ramonGym ? '💪' : '';
+                
+                calendarDays.innerHTML += `
+                    <div class="${className}" onclick="goToDate('${dateKey}')">
+                        <div>${day}</div>
+                        <div style="font-size: 0.75rem;">${emoji}</div>
                     </div>
+                `;
+            }
+        }
 
-                    {/* Modal de Peso */}
-                    {showWeightModal && (
-                        <div style={{ 
-                            position: 'fixed', 
-                            inset: 0, 
-                            background: 'rgba(0, 0, 0, 0.7)', 
-                            backdropFilter: 'blur(8px)',
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
-                            zIndex: 50,
-                            padding: '1rem'
-                        }}>
-                            <div className="card animate-fade-in" style={{ borderRadius: '1rem', padding: '2rem', maxWidth: '28rem', width: '100%' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                                    <h3 className="title-font" style={{ fontSize: '1.5rem' }}>
-                                        Peso - {selectedPerson === 'kamila' ? 'Kamila' : 'Ramon'}
-                                    </h3>
-                                    <button
-                                        onClick={() => setShowWeightModal(false)}
-                                        className="btn-primary glass"
-                                        style={{ padding: '0.5rem', borderRadius: '0.5rem' }}
-                                    >
-                                        <i data-lucide="x" style={{ width: '24px', height: '24px' }}></i>
-                                    </button>
-                                </div>
-                                
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={tempWeight}
-                                    onChange={(e) => setTempWeight(e.target.value)}
-                                    placeholder="Digite o peso em kg"
-                                    className="glass"
-                                    style={{ 
-                                        width: '100%', 
-                                        padding: '1rem', 
-                                        borderRadius: '0.75rem',
-                                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                                        color: 'white',
-                                        fontSize: '1.25rem',
-                                        marginBottom: '1.5rem',
-                                        background: 'rgba(255, 255, 255, 0.05)'
-                                    }}
-                                    autoFocus
-                                />
-                                
-                                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                    <button
-                                        onClick={() => setShowWeightModal(false)}
-                                        className="btn-primary glass"
-                                        style={{ flex: 1, padding: '1rem', borderRadius: '0.75rem' }}
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button
-                                        onClick={saveWeight}
-                                        className={`btn-primary ${selectedPerson === 'kamila' ? 'gradient-kamila' : 'gradient-ramon'}`}
-                                        style={{ 
-                                            flex: 1, 
-                                            padding: '1rem', 
-                                            borderRadius: '0.75rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '0.5rem'
-                                        }}
-                                    >
-                                        <i data-lucide="save" style={{ width: '20px', height: '20px' }}></i>
-                                        Salvar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
+        // Ir para data específica
+        function goToDate(dateKey) {
+            currentDate = new Date(dateKey);
+            showView('dashboard');
+        }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<GymTracker />);
+        // Mostrar view
+        function showView(view) {
+            currentView = view;
+            
+            // Atualizar botões de navegação
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            
+            if (view === 'dashboard') {
+                navBtns[0].classList.add('active');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('calendar').classList.add('hidden');
+                updateDashboard();
+            } else {
+                navBtns[1].classList.add('active');
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('calendar').classList.remove('hidden');
+                updateCalendar();
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateDashboard();
+            
+            // Enter no modal de peso
+            document.getElementById('weight-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveWeight();
+                }
+            });
+            
+            // Fechar modal ao clicar fora
+            document.getElementById('weight-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeWeightModal();
+                }
+            });
+        });
     </script>
 </body>
 </html>
