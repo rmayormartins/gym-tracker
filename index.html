@@ -365,10 +365,12 @@
         .modal-buttons {
             display: flex;
             gap: 0.75rem;
+            flex-wrap: wrap;
         }
         
         .modal-buttons .btn {
             flex: 1;
+            min-width: 100px;
         }
         
         .btn-save.kamila {
@@ -583,11 +585,11 @@
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; position: relative; z-index: 1;">
                             <button class="btn" id="kamila-food-yes" onclick="setFood('kamila', true)" 
-                                    style="background: rgba(16, 185, 129, 0.2); border: 2px solid transparent;">
+                                    style="background: rgba(168, 85, 247, 0.2); border: 2px solid transparent;">
                                 ✓ Sim
                             </button>
                             <button class="btn" id="kamila-food-no" onclick="setFood('kamila', false)"
-                                    style="background: rgba(239, 68, 68, 0.2); border: 2px solid transparent;">
+                                    style="background: rgba(100, 116, 139, 0.3); border: 2px solid transparent;">
                                 ✗ Não
                             </button>
                         </div>
@@ -626,11 +628,11 @@
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; position: relative; z-index: 1;">
                             <button class="btn" id="ramon-food-yes" onclick="setFood('ramon', true)"
-                                    style="background: rgba(16, 185, 129, 0.2); border: 2px solid transparent;">
+                                    style="background: rgba(168, 85, 247, 0.2); border: 2px solid transparent;">
                                 ✓ Sim
                             </button>
                             <button class="btn" id="ramon-food-no" onclick="setFood('ramon', false)"
-                                    style="background: rgba(239, 68, 68, 0.2); border: 2px solid transparent;">
+                                    style="background: rgba(100, 116, 139, 0.3); border: 2px solid transparent;">
                                 ✗ Não
                             </button>
                         </div>
@@ -901,6 +903,7 @@
             />
             <div class="modal-buttons">
                 <button class="btn" onclick="closeWeightModal()">Cancelar</button>
+                <button class="btn" onclick="clearWeight()" style="background: rgba(239, 68, 68, 0.3);">🗑️ Limpar</button>
                 <button class="btn btn-save" id="save-weight-btn" onclick="saveWeight()">💾 Salvar</button>
             </div>
         </div>
@@ -1062,6 +1065,27 @@
             closeWeightModal();
         }
 
+        // Limpar peso
+        function clearWeight() {
+            const dateKey = getDateKey(currentDate);
+            
+            if (!data[dateKey]) {
+                data[dateKey] = {
+                    kamilaGym: false,
+                    ramonGym: false,
+                    kamilaWeight: null,
+                    ramonWeight: null,
+                    kamilaFood: null,
+                    ramonFood: null
+                };
+            }
+            
+            data[dateKey][`${selectedPerson}Weight`] = null;
+            saveData();
+            updateDashboard();
+            closeWeightModal();
+        }
+
         // Calcular estatísticas
         function calculateStats() {
             const today = getDateKey(currentDate);
@@ -1172,19 +1196,19 @@
             const kamilaNoBtn = document.getElementById('kamila-food-no');
             
             if (todayData.kamilaFood === true) {
-                kamilaYesBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-                kamilaYesBtn.style.borderColor = '#10b981';
-                kamilaNoBtn.style.background = 'rgba(239, 68, 68, 0.2)';
+                kamilaYesBtn.style.background = 'linear-gradient(135deg, #a855f7, #9333ea)';
+                kamilaYesBtn.style.borderColor = '#a855f7';
+                kamilaNoBtn.style.background = 'rgba(100, 116, 139, 0.3)';
                 kamilaNoBtn.style.borderColor = 'transparent';
             } else if (todayData.kamilaFood === false) {
-                kamilaYesBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+                kamilaYesBtn.style.background = 'rgba(168, 85, 247, 0.2)';
                 kamilaYesBtn.style.borderColor = 'transparent';
-                kamilaNoBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-                kamilaNoBtn.style.borderColor = '#ef4444';
+                kamilaNoBtn.style.background = 'rgba(100, 116, 139, 0.8)';
+                kamilaNoBtn.style.borderColor = '#64748b';
             } else {
-                kamilaYesBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+                kamilaYesBtn.style.background = 'rgba(168, 85, 247, 0.2)';
                 kamilaYesBtn.style.borderColor = 'transparent';
-                kamilaNoBtn.style.background = 'rgba(239, 68, 68, 0.2)';
+                kamilaNoBtn.style.background = 'rgba(100, 116, 139, 0.3)';
                 kamilaNoBtn.style.borderColor = 'transparent';
             }
             
@@ -1193,19 +1217,19 @@
             const ramonNoBtn = document.getElementById('ramon-food-no');
             
             if (todayData.ramonFood === true) {
-                ramonYesBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-                ramonYesBtn.style.borderColor = '#10b981';
-                ramonNoBtn.style.background = 'rgba(239, 68, 68, 0.2)';
+                ramonYesBtn.style.background = 'linear-gradient(135deg, #a855f7, #9333ea)';
+                ramonYesBtn.style.borderColor = '#a855f7';
+                ramonNoBtn.style.background = 'rgba(100, 116, 139, 0.3)';
                 ramonNoBtn.style.borderColor = 'transparent';
             } else if (todayData.ramonFood === false) {
-                ramonYesBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+                ramonYesBtn.style.background = 'rgba(168, 85, 247, 0.2)';
                 ramonYesBtn.style.borderColor = 'transparent';
-                ramonNoBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-                ramonNoBtn.style.borderColor = '#ef4444';
+                ramonNoBtn.style.background = 'rgba(100, 116, 139, 0.8)';
+                ramonNoBtn.style.borderColor = '#64748b';
             } else {
-                ramonYesBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+                ramonYesBtn.style.background = 'rgba(168, 85, 247, 0.2)';
                 ramonYesBtn.style.borderColor = 'transparent';
-                ramonNoBtn.style.background = 'rgba(239, 68, 68, 0.2)';
+                ramonNoBtn.style.background = 'rgba(100, 116, 139, 0.3)';
                 ramonNoBtn.style.borderColor = 'transparent';
             }
         }
@@ -1574,13 +1598,13 @@
                         {
                             label: 'Kamila',
                             data: foodData.map(d => d.kamila),
-                            backgroundColor: '#10b981',
+                            backgroundColor: '#a855f7',
                             borderRadius: 8
                         },
                         {
                             label: 'Ramon',
                             data: foodData.map(d => d.ramon),
-                            backgroundColor: '#3b82f6',
+                            backgroundColor: '#8b5cf6',
                             borderRadius: 8
                         }
                     ]
