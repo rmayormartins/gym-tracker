@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -438,6 +441,20 @@
             animation: fadeIn 0.5s ease-out;
         }
         
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
         @media (max-width: 640px) {
             body {
                 padding: 0.5rem;
@@ -472,6 +489,7 @@
         <div class="nav">
             <button class="nav-btn active" onclick="showView('dashboard')">📊 Dashboard</button>
             <button class="nav-btn" onclick="showView('calendar')">📅 Calendário</button>
+            <button class="nav-btn" onclick="showView('charts')">📈 Gráficos</button>
         </div>
 
         <!-- Dashboard View -->
@@ -601,6 +619,51 @@
                 </div>
             </div>
         </div>
+
+        <!-- Charts View -->
+        <div id="charts" class="view hidden">
+            <div class="card">
+                <div class="chart-title title-font">
+                    📊 Evolução de Peso
+                </div>
+                <div class="chart-container">
+                    <canvas id="weight-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="chart-title title-font">
+                    📈 Frequência Mensal
+                </div>
+                <div class="chart-container">
+                    <canvas id="frequency-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="chart-title title-font">
+                    🔥 Sequência de Dias
+                </div>
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                    <div class="stat-box">
+                        <div class="stat-label">Sequência Atual Kamila</div>
+                        <div class="stat-value kamila" id="streak-kamila">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Sequência Atual Ramon</div>
+                        <div class="stat-value ramon" id="streak-ramon">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Melhor Sequência Kamila</div>
+                        <div class="stat-value kamila" id="best-streak-kamila">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Melhor Sequência Ramon</div>
+                        <div class="stat-value ramon" id="best-streak-ramon">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Weight Modal -->
@@ -630,6 +693,8 @@
         let currentView = 'dashboard';
         let data = {};
         let selectedPerson = null;
+        let weightChart = null;
+        let frequencyChart = null;
 
         // Carregar dados do localStorage
         function loadData() {
@@ -811,17 +876,21 @@
             if (stats.todayKamila) {
                 kamilaBtn.textContent = '✓ FOI NA ACADEMIA';
                 kamilaBtn.classList.add('active', 'kamila');
+                kamilaBtn.title = 'Clique novamente para desmarcar';
             } else {
                 kamilaBtn.textContent = 'REGISTRAR IDA';
                 kamilaBtn.classList.remove('active', 'kamila');
+                kamilaBtn.title = '';
             }
             
             if (stats.todayRamon) {
                 ramonBtn.textContent = '✓ FOI NA ACADEMIA';
                 ramonBtn.classList.add('active', 'ramon');
+                ramonBtn.title = 'Clique novamente para desmarcar';
             } else {
                 ramonBtn.textContent = 'REGISTRAR IDA';
                 ramonBtn.classList.remove('active', 'ramon');
+                ramonBtn.title = '';
             }
             
             // Pesos
@@ -925,17 +994,256 @@
             const navBtns = document.querySelectorAll('.nav-btn');
             navBtns.forEach(btn => btn.classList.remove('active'));
             
+            // Esconder todas as views
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('calendar').classList.add('hidden');
+            document.getElementById('charts').classList.add('hidden');
+            
             if (view === 'dashboard') {
                 navBtns[0].classList.add('active');
                 document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('calendar').classList.add('hidden');
                 updateDashboard();
-            } else {
+            } else if (view === 'calendar') {
                 navBtns[1].classList.add('active');
-                document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('calendar').classList.remove('hidden');
                 updateCalendar();
+            } else if (view === 'charts') {
+                navBtns[2].classList.add('active');
+                document.getElementById('charts').classList.remove('hidden');
+                updateCharts();
             }
+        }
+
+        // Calcular sequências
+        function calculateStreaks() {
+            const sortedKeys = Object.keys(data).sort();
+            if (sortedKeys.length === 0) {
+                return {
+                    currentKamila: 0,
+                    currentRamon: 0,
+                    bestKamila: 0,
+                    bestRamon: 0
+                };
+            }
+
+            let currentKamila = 0, currentRamon = 0;
+            let bestKamila = 0, bestRamon = 0;
+            let tempKamila = 0, tempRamon = 0;
+
+            // Calcular sequência atual (dos dias mais recentes)
+            for (let i = sortedKeys.length - 1; i >= 0; i--) {
+                const key = sortedKeys[i];
+                if (data[key].kamilaGym) {
+                    currentKamila++;
+                } else {
+                    break;
+                }
+            }
+
+            for (let i = sortedKeys.length - 1; i >= 0; i--) {
+                const key = sortedKeys[i];
+                if (data[key].ramonGym) {
+                    currentRamon++;
+                } else {
+                    break;
+                }
+            }
+
+            // Calcular melhor sequência
+            for (let key of sortedKeys) {
+                if (data[key].kamilaGym) {
+                    tempKamila++;
+                    bestKamila = Math.max(bestKamila, tempKamila);
+                } else {
+                    tempKamila = 0;
+                }
+
+                if (data[key].ramonGym) {
+                    tempRamon++;
+                    bestRamon = Math.max(bestRamon, tempRamon);
+                } else {
+                    tempRamon = 0;
+                }
+            }
+
+            return {
+                currentKamila,
+                currentRamon,
+                bestKamila,
+                bestRamon
+            };
+        }
+
+        // Atualizar gráficos
+        function updateCharts() {
+            const sortedKeys = Object.keys(data).sort();
+            
+            // Dados para gráfico de peso (últimos 30 registros com peso)
+            const weightData = sortedKeys
+                .filter(key => data[key].kamilaWeight || data[key].ramonWeight)
+                .slice(-30)
+                .map(key => ({
+                    date: new Date(key).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                    kamila: data[key].kamilaWeight || null,
+                    ramon: data[key].ramonWeight || null
+                }));
+
+            // Dados para gráfico de frequência mensal
+            const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const monthlyData = {};
+            
+            sortedKeys.forEach(key => {
+                const date = new Date(key);
+                const monthKey = `${monthNames[date.getMonth()]}/${date.getFullYear().toString().slice(-2)}`;
+                
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = { kamila: 0, ramon: 0 };
+                }
+                
+                if (data[key].kamilaGym) monthlyData[monthKey].kamila++;
+                if (data[key].ramonGym) monthlyData[monthKey].ramon++;
+            });
+
+            const frequencyData = Object.keys(monthlyData)
+                .slice(-12)
+                .map(month => ({
+                    month,
+                    kamila: monthlyData[month].kamila,
+                    ramon: monthlyData[month].ramon
+                }));
+
+            // Destruir gráficos antigos se existirem
+            if (weightChart) weightChart.destroy();
+            if (frequencyChart) frequencyChart.destroy();
+
+            // Criar gráfico de peso
+            const weightCtx = document.getElementById('weight-chart').getContext('2d');
+            weightChart = new Chart(weightCtx, {
+                type: 'line',
+                data: {
+                    labels: weightData.map(d => d.date),
+                    datasets: [
+                        {
+                            label: 'Kamila',
+                            data: weightData.map(d => d.kamila),
+                            borderColor: '#ec4899',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#ec4899'
+                        },
+                        {
+                            label: 'Ramon',
+                            data: weightData.map(d => d.ramon),
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#06b6d4'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: {
+                                    size: 14,
+                                    family: 'Inter'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Criar gráfico de frequência
+            const frequencyCtx = document.getElementById('frequency-chart').getContext('2d');
+            frequencyChart = new Chart(frequencyCtx, {
+                type: 'bar',
+                data: {
+                    labels: frequencyData.map(d => d.month),
+                    datasets: [
+                        {
+                            label: 'Kamila',
+                            data: frequencyData.map(d => d.kamila),
+                            backgroundColor: '#ec4899',
+                            borderRadius: 8
+                        },
+                        {
+                            label: 'Ramon',
+                            data: frequencyData.map(d => d.ramon),
+                            backgroundColor: '#06b6d4',
+                            borderRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: {
+                                    size: 14,
+                                    family: 'Inter'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Atualizar sequências
+            const streaks = calculateStreaks();
+            document.getElementById('streak-kamila').textContent = streaks.currentKamila;
+            document.getElementById('streak-ramon').textContent = streaks.currentRamon;
+            document.getElementById('best-streak-kamila').textContent = streaks.bestKamila;
+            document.getElementById('best-streak-ramon').textContent = streaks.bestRamon;
         }
 
         // Inicializar
