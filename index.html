@@ -701,18 +701,18 @@
                             <div class="avatar kamila">👩</div>
                             <h3 class="title-font">Kamila</h3>
                         </div>
-                        <span style="font-size: 2rem;">🏆</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                     <button class="btn btn-gym title-font" id="kamila-gym" onclick="toggleGym('kamila')">
                         REGISTRAR ATIVIDADE
                     </button>
                     <button class="btn btn-weight" onclick="openWeightModal('kamila')">
-                        ⚖️ Peso: <span id="kamila-weight">--</span> kg
+                        Peso: <span id="kamila-weight">--</span> kg
                     </button>
                     
                     <div style="margin-bottom: 1rem;">
                         <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem; text-align: center;">
-                            🥗 Alimentou-se bem hoje?
+                            Alimentou-se bem hoje?
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; position: relative; z-index: 1;">
                             <button class="btn" id="kamila-food-yes" onclick="setFood('kamila', true)" 
@@ -744,7 +744,7 @@
                             <div class="avatar ramon">👨</div>
                             <h3 class="title-font">Ramon</h3>
                         </div>
-                        <span style="font-size: 2rem;">🏆</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                     <button class="btn btn-gym title-font" id="ramon-gym" onclick="toggleGym('ramon')">
                         REGISTRAR ATIVIDADE
@@ -755,7 +755,7 @@
                     
                     <div style="margin-bottom: 1rem;">
                         <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem; text-align: center;">
-                            🥗 Alimentou-se bem hoje?
+                            Alimentou-se bem hoje?
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; position: relative; z-index: 1;">
                             <button class="btn" id="ramon-food-yes" onclick="setFood('ramon', true)"
@@ -807,18 +807,18 @@
             <div style="text-align: center; margin-top: 2rem;">
                 <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                     <button class="btn" onclick="exportData()" style="padding: 1rem 1.5rem; background: rgba(255, 255, 255, 0.05);">
-                        📥 Exportar CSV
+                        💾 Exportar CSV
                     </button>
                     <button class="btn" onclick="exportBackup()" style="padding: 1rem 1.5rem; background: rgba(168, 85, 247, 0.2);">
                         💾 Backup JSON
                     </button>
                     <button class="btn" onclick="document.getElementById('import-file').click()" style="padding: 1rem 1.5rem; background: rgba(6, 182, 212, 0.2);">
-                        📂 Importar Backup
+                        💾 Importar Backup
                     </button>
                 </div>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importBackup(event)">
                 <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 1rem;">
-                    💡 Dica: Guarde o arquivo JSON no seu repositório GitHub como backup!
+                    
                 </p>
             </div>
         </div>
@@ -1022,7 +1022,7 @@
 
             <!-- Placar Geral -->
             <div class="card">
-                <h2 class="chart-title title-font">🎯 Placar Geral de Troféus</h2>
+                <h2 class="chart-title title-font"> Placar Geral de Troféus</h2>
                 <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                     <div class="stat-box">
                         <div class="stat-label">🏆 Troféus Kamila</div>
@@ -1105,11 +1105,11 @@
 
         // Login com Google
         async function loginWithGoogle() {
-            console.log('🔑 Tentando fazer login...');
-            console.log('🔥 Firebase habilitado?', isFirebaseEnabled);
+            console.log(' Tentando fazer login...');
+            console.log(' Firebase habilitado?', isFirebaseEnabled);
             
             if (!isFirebaseEnabled) {
-                alert('⚠️ Firebase não está configurado.\n\nPara habilitar sincronização:\n1. Crie um projeto no Firebase Console\n2. Adicione as credenciais no código\n\nEnquanto isso, o app funciona offline!');
+                alert(' Firebase não está configurado.\n\nPara habilitar sincronização:\n1. Crie um projeto no Firebase Console\n2. Adicione as credenciais no código\n\nEnquanto isso, o app funciona offline!');
                 showApp();
                 return;
             }
@@ -1121,7 +1121,7 @@
             }
 
             try {
-                console.log('🚀 Iniciando popup de login...');
+                console.log(' Iniciando popup de login...');
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await auth.signInWithPopup(provider);
                 console.log('✅ Login bem-sucedido!', result.user.email);
@@ -2174,7 +2174,7 @@
 
             if (kamilaValue === null && ramonValue === null) {
                 winner = '-';
-                emoji = '🤷';
+                emoji = '-';
                 score = 'Sem dados';
             } else if (kamilaValue === null) {
                 winner = 'Ramon';
