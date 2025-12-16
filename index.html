@@ -1061,23 +1061,24 @@
 
     <script>
         // ========================================
-        // FIREBASE CONF
+        // FIREBASE CONFIGURATION
         // ========================================
         
+        // IMPORTANTE: Substitua com suas credenciais do Firebase
+        // Para obter as credenciais:
+        // 1. Acesse https://console.firebase.google.com/
+        // 2. Crie um novo projeto (ou use existente)
+        // 3. Adicione um app Web
+        // 4. Copie a configuração e cole aqui
         
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBfP7eNJKF3TkF62nNFD6W-SS7BcfYJIng",
-  authDomain: "gym-tracker-88356.firebaseapp.com",
-  projectId: "gym-tracker-88356",
-  storageBucket: "gym-tracker-88356.firebasestorage.app",
-  messagingSenderId: "52182726338",
-  appId: "1:52182726338:web:f361726421584cf510ad5b"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfP7eNJKF3TkF62nNFD6W-SS7BcfYJIng",
+            authDomain: "gym-tracker-88356.firebaseapp.com",
+            projectId: "gym-tracker-88356",
+            storageBucket: "gym-tracker-88356.firebasestorage.app",
+            messagingSenderId: "52182726338",
+            appId: "1:52182726338:web:f361726421584cf510ad5b"
+        };
 
         // Inicializar Firebase
         let db = null;
@@ -1091,8 +1092,10 @@ const firebaseConfig = {
             auth = firebase.auth();
             isFirebaseEnabled = true;
             console.log('✅ Firebase inicializado com sucesso');
+            console.log('📧 Auth domain:', firebaseConfig.authDomain);
         } catch (error) {
-            console.warn('⚠️ Firebase não configurado. Usando modo offline.', error);
+            console.error('❌ Erro ao inicializar Firebase:', error);
+            alert('❌ Erro ao inicializar Firebase: ' + error.message);
             isFirebaseEnabled = false;
         }
 
@@ -1102,19 +1105,40 @@ const firebaseConfig = {
 
         // Login com Google
         async function loginWithGoogle() {
+            console.log('🔑 Tentando fazer login...');
+            console.log('🔥 Firebase habilitado?', isFirebaseEnabled);
+            
             if (!isFirebaseEnabled) {
                 alert('⚠️ Firebase não está configurado.\n\nPara habilitar sincronização:\n1. Crie um projeto no Firebase Console\n2. Adicione as credenciais no código\n\nEnquanto isso, o app funciona offline!');
                 showApp();
                 return;
             }
 
+            if (!auth) {
+                alert('❌ Erro: Sistema de autenticação não inicializado.');
+                console.error('Auth não está disponível');
+                return;
+            }
+
             try {
+                console.log('🚀 Iniciando popup de login...');
                 const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
+                const result = await auth.signInWithPopup(provider);
+                console.log('✅ Login bem-sucedido!', result.user.email);
                 // O onAuthStateChanged vai cuidar do resto
             } catch (error) {
-                console.error('Erro no login:', error);
-                alert('❌ Erro ao fazer login. Tente novamente.');
+                console.error('❌ Erro no login:', error);
+                console.error('Código do erro:', error.code);
+                console.error('Mensagem:', error.message);
+                
+                let errorMsg = 'Erro ao fazer login: ' + error.message;
+                if (error.code === 'auth/popup-blocked') {
+                    errorMsg = '⚠️ Popup bloqueado!\n\nPor favor, permita popups neste site e tente novamente.';
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    errorMsg = '⚠️ Domínio não autorizado!\n\nAdicione este domínio nas configurações do Firebase:\n' + window.location.hostname;
+                }
+                
+                alert(errorMsg);
             }
         }
 
