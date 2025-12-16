@@ -1061,24 +1061,23 @@
 
     <script>
         // ========================================
-        // FIREBASE CONFIGURATION
+        // FIREBASE CONF
         // ========================================
         
-        // IMPORTANTE: Substitua com suas credenciais do Firebase
-        // Para obter as credenciais:
-        // 1. Acesse https://console.firebase.google.com/
-        // 2. Crie um novo projeto (ou use existente)
-        // 3. Adicione um app Web
-        // 4. Copie a configuração e cole aqui
         
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY_AQUI",
-            authDomain: "seu-projeto.firebaseapp.com",
-            projectId: "seu-projeto-id",
-            storageBucket: "seu-projeto.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef123456"
-        };
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBfP7eNJKF3TkF62nNFD6W-SS7BcfYJIng",
+  authDomain: "gym-tracker-88356.firebaseapp.com",
+  projectId: "gym-tracker-88356",
+  storageBucket: "gym-tracker-88356.firebasestorage.app",
+  messagingSenderId: "52182726338",
+  appId: "1:52182726338:web:f361726421584cf510ad5b"
+};
 
         // Inicializar Firebase
         let db = null;
